@@ -1,0 +1,13 @@
+openapi: 3.0.3
+info:
+  title: Request Bitrix Chasi APIs Definition
+  description: |
+    Данное API преднозначено для обмена данными с сайтом chasidesk.requestbitrix.ru
+  contact:
+    email: ma-ks2@ya.ru
+  version: 1.0.0
+servers:
+  - url: http://chasidesk.requestbitrix.ru/api
+    description: Development server
+paths:
+  {}
