@@ -2,12 +2,321 @@ openapi: 3.0.3
 info:
   title: Request Bitrix Chasi APIs Definition
   description: |
-    Данное API преднозначено для обмена данными с сайтом chasidesk.requestbitrix.ru
+    Данное API преднозначено для обмена данными с сайтом chasidesk.requestbitrix.ru.
+    Ответ приходит в следующем формате:
+    - Успешный:
+      `{
+        status: "success",
+        data: ответ_из_соответствующего_запроса,
+        errors: {}
+      }`
+    - Ошибка:
+      `{
+        status: "error",
+        data: null,
+        errors: ответ_с_ошибкой_из_соответствующего_запроса
+      }`
   contact:
     email: ma-ks2@ya.ru
   version: 1.0.0
 servers:
   - url: http://chasidesk.requestbitrix.ru/api
     description: Development server
+tags:
+  - name: CSRF-токен
+  - name: Аутентификация
+  - name: Объявления
+  - name: Бренды
 paths:
-  {}
+  /csrf:
+    get:
+      tags:
+        - CSRF-токен
+      summary: Токен сессии
+      description: |
+        Возвращает токен сессии.
+        Используйте полученный токен, передавая его в каждом запросе, используя ключ `sessid`
+      responses:
+        '200':
+          description: Возвращает токен сессии
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sessid:
+                    type: string
+                    description: "Токен сессии"
+                example:
+                  sessid: "53eb06e0a1903fd3f773ad6624adc0f9"
+  /login:
+    post:
+      tags:
+        - Аутентификация
+      summary: Авторизация пользователя
+      description: |
+        Для авторизация пользователя, используйте либо `email` для авторизации по почте, либо `phone` для авторизации по номеру телефона
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Login"
+      responses:
+        '204':
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+  /ad:
+    get:
+      tags: 
+        - Объявления
+      summary: Список объявлений
+      description: Возвращает список объявлений
+      parameters:
+        - $ref: "#/components/parameters/sortQueryParam"
+        - $ref: "#/components/parameters/fieldsQueryParam"
+        - $ref: "#/components/parameters/limitQueryParam"
+        - $ref: "#/components/parameters/pageQueryParam"
+      responses:
+        '200':
+          description: Возвращает список объявлений
+          content: 
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Ad"
+              examples:
+                value:
+                  $ref: "#/components/examples/Ad"
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+  /brand:
+    get:
+      tags:
+        - Бренды
+      summary: Список брендов
+      description: Возвращает список брендов
+      responses:
+        '200':
+          description: Возвращает список брендов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Brand"
+              examples:
+                value:
+                  $ref: "#/components/schemas/Brand"
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+components:
+  parameters:
+    sortQueryParam:
+      description: |
+        Используйте поле `sort` для сортировки запрашиваемых ресурсов. Поле `sort` представляет собой строку, состоящую из полей, по которым будет происходить сортировка, разделенные запятой. Если по определенному полю нужно изменить направление сортировки в обратную сторону, то перед названием поля нужно поставить знак `-`. Например: `?sort=id,-model`, `?sort=-id`
+      name: sort
+      in: query
+      schema:
+        type: string
+      example: "-id,model"
+    fieldsQueryParam:
+      description: |
+        Используйте поле `fields`, чтобы запрашиваемы ресурсы, содержали не все поля, а только указанные. Поле `fields` представляет собой строку, состоящую из запрашиваемых полей разделенных запятой. Например: `?fields=id,model` 
+      name: fields
+      in: query
+      schema:
+        type: string
+      example: "id,model"
+    limitQueryParam:
+      description: |
+        Используйте поле `limits` для пагинации, чтобы ограничить количество выводимых сущностей. Например: `?limits=16`. По умолчанию 0.
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+      example: 50
+    pageQueryParam:
+      description: |
+        Используйте поле `page` для пагинации, чтобы указать номер страницы запрашиваемых ресурсов. Обязательно наличие поля `limits`. Например: `?limits=16&page=2`. Если указать поле `limits` без поля `page`, то поле `page` по умолчанию равно 1.
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+      example: 2
+  schemas:
+    BadRequest:
+      type: object
+      properties:
+        message:
+          type: string
+          description: "Содержит текст ошибки"
+        code:
+          type: string
+          description: "Содержит символьный код ошибки"
+    Login:
+      type: object
+      properties:
+        email:
+          type: string
+        phone:
+          type: string
+        password:
+          type: string
+      required: [password]
+    Ad:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Id объявления
+        model:
+          type: string
+          description: Модель часов
+        condition:
+          type: string
+          description: Состояние часов
+        gender:
+          type: string
+          description: Пол
+        year:
+          type: string
+          description: Год выпуска
+        mechanism:
+          type: string
+          description: Тип механизма
+        sellerType:
+          type: string
+          description: Вид продавца
+        material:
+          type: string
+          description: Материал часов
+        form:
+          type: string
+          description: Форма часов
+        size:
+          type: string
+          description: Размер часов
+        watchband:
+          type: string
+          description: Материал ремешка
+        clasp:
+          type: string
+          description: Тип застежки
+        dial:
+          type: string
+          description: Тип циферблата
+        waterProtection:
+          type: string
+          description: Водозащита
+        description:
+          type: string
+          description: Описание
+        price:
+          type: string
+          description: Стоимость часов
+        photo:
+          type: array
+          items:
+            type: string
+          description: URL адреса к фото с часами
+        city: 
+          type: string
+          description: Город продажи
+        brand:
+          $ref: "#/components/schemas/Brand"
+        frameColor:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+          description: Цвет корпуса
+        dialColor:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+          description: Цвет циферблата
+        country:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+          description: Страна производства
+    Brand:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        code:
+          type: string
+      description: Бренд часов
+  examples:
+    Ad:
+      value:
+        - id: "1"
+          model: "TEST"
+          condition: "Новые"
+          gender: "Мужской"
+          year: "2020"
+          mechanism: "Кварцевый"
+          sellerType: "Частный продавец"
+          material: "Алюминий"
+          form: "Бочка"
+          size: "34 мм"
+          watchband: "Кожа"
+          clasp: "Раскладывающаяся застёжка"
+          dial: "Цифровой"
+          waterProtection: "3 ATM"
+          description: "Описание"
+          price: "5000"
+          photo: 
+            - "/upload/uf/6b4/0rxlrge47ssthmbgf599wuonte49n7we.jpg"
+            - "/upload/uf/6b4/0rxlrge47ssthmbgf599wuonte49n7we.jpg"
+          city: ""
+          brand:
+            id: "3"
+            name: "Fossil"
+            code: "fossil"
+          frameColor: 
+            id: "1"
+            name: "Синий"
+          dialColor: 
+            id: "1"
+            name: "Синий"
+          country:
+            id: "6"
+            name: "Австрия"
+    Brand:
+      value:
+        - id: "1"
+          name: "Rolex"
+          code: "rolex"
