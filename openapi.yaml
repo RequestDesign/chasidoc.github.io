@@ -4,18 +4,20 @@ info:
   description: |
     Данное API преднозначено для обмена данными с сайтом chasidesk.requestbitrix.ru.
     Ответ приходит в следующем формате:
-    - Успешный:
+    * Успешный:<br>
       `{
         status: "success",
         data: ответ_из_соответствующего_запроса,
         errors: {}
-      }`
-    - Ошибка:
+      }`.
+      При пагинации появляется дополнительное поле `{_metadata: {total: int, limit: int, page: int, first_page: int, last_page: int, prev_page: int, next_page: int}}`. Поле `prev_page` и `next_page` является необязательным.
+    * Ошибка: <br>
       `{
         status: "error",
         data: null,
         errors: ответ_с_ошибкой_из_соответствующего_запроса
-      }`
+      }`<br>
+    
   contact:
     email: ma-ks2@ya.ru
   version: 1.0.0
@@ -26,6 +28,7 @@ tags:
   - name: CSRF-токен
   - name: Аутентификация
   - name: Объявления
+  - name: Рекламы
   - name: Бренды
 paths:
   /csrf:
@@ -75,7 +78,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BadRequest"
-  /ad:
+        '403':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+  /ads:
     get:
       tags: 
         - Объявления
@@ -86,6 +95,7 @@ paths:
         - $ref: "#/components/parameters/fieldsQueryParam"
         - $ref: "#/components/parameters/limitQueryParam"
         - $ref: "#/components/parameters/pageQueryParam"
+        - $ref: "#/components/parameters/adsFilterQueryParam"
       responses:
         '200':
           description: Возвращает список объявлений
@@ -104,7 +114,38 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BadRequest"
-  /brand:
+  /filter:
+    get:
+      tags:
+        - Объявления
+      summary: Список данных для создания фильтра
+      description: Возвращает информацию об уникальных значениях текстовых свойств и граничные значения числовых свойств
+      responses:
+        '200':
+          description: Возвращает массив данных для фильтра
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdsFilter"
+  /advs:
+    get:
+      tags:
+        - Рекламы
+      summary: Список реклам
+      description: Возвращает список реклам
+      parameters:
+        - $ref: "#/components/parameters/limitQueryParam"
+        - $ref: "#/components/parameters/pageQueryParam"
+      responses:
+        '200':
+          description: Возвращает список реклам
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Adv"
+  /brands:
     get:
       tags:
         - Бренды
@@ -164,6 +205,90 @@ components:
         type: integer
         minimum: 1
       example: 2
+    adsFilterQueryParam:
+      description: |
+        Используйте поле `filter` для фильтрации объявлений. Параметр запроса должен представлять json строку. Например `?filter={"<=year":2020}`. Структура содержимого json-строки представлена ниже. Большинство свойств принимает в качестве значения массив, состоящий из id элементов. Числовые свойства перед названием должны содержать знак `>`, `>=`, `<` или `<=`.
+      name: filter
+      in: query
+      schema:
+        type: object
+        properties:
+          brand:
+            type: array
+            items: 
+              type: integer
+          condition:
+            type: array
+            items: 
+              type: integer
+          gender:
+            type: array
+            items: 
+              type: integer
+          "<year":
+            type: integer
+          "<=year":
+            type: integer
+          ">year":
+            type: integer
+          ">=year":
+            type: integer
+          mechanism:
+            type: array
+            items: 
+              type: integer
+          frameColor:
+            type: array
+            items: 
+              type: integer
+          dialColor:
+            type: array
+            items: 
+              type: integer
+          country:
+            type: array
+            items: 
+              type: integer
+          sellerType:
+            type: array
+            items: 
+              type: integer
+          material:
+            type: array
+            items: 
+              type: integer
+          form:
+            type: array
+            items: 
+              type: integer
+          watchband:
+            type: array
+            items: 
+              type: integer
+          clasp:
+            type: array
+            items: 
+              type: integer
+          dial:
+            type: array
+            items: 
+              type: integer
+          waterProtection:
+            type: array
+            items: 
+              type: integer
+          "<price":
+            type: number
+          "<=price":
+            type: number
+          ">price":
+            type: number
+          ">=price":
+            type: number
+          city: 
+            type: array
+            items:
+              type: string
   schemas:
     BadRequest:
       type: object
@@ -269,6 +394,171 @@ components:
             name:
               type: string
           description: Страна производства
+        userId:
+          type: integer
+          description: ID пользователя, разместившего объявление
+    AdsFilter:
+      type: object
+      properties:
+        brand:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+        condition:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+        gender:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+        year:
+          type: array
+          items:
+            type: object
+            properties:
+              min: 
+                type: string
+              max: 
+                type: string
+        mechanism:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+        frameColor:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+        dialColor:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+        country:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+        sellerType:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+        material:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+        form:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+        watchband:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+        clasp:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+        dial:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+        waterProtection:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+        price:
+          type: array
+          items:
+            type: object
+            properties:
+              min: 
+                type: string
+              max: 
+                type: string
+        city:
+          type: array
+          items:
+            type: string
+    Adv:
+      type: object
+      properties:
+        id: 
+          type: string
+        name:
+          type: string
+        photo:
+          type: string
+        description:
+          type: string
     Brand:
       type: object
       properties:
@@ -315,6 +605,7 @@ components:
           country:
             id: "6"
             name: "Австрия"
+          userId: 1
     Brand:
       value:
         - id: "1"
