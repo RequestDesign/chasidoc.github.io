@@ -30,6 +30,7 @@ tags:
   - name: Объявления
   - name: Рекламы
   - name: Бренды
+  - name: Регистрация
 paths:
   /csrf:
     get:
@@ -84,6 +85,113 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BadRequest"
+  /logout:
+    post:
+      tags:
+        - Аутентификация
+      summary: Производит выход из аккаунта
+      responses:
+        '204':
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+        '401':
+          description: "Метод недоступен неавторизованным пользователям"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorizationError"
+  /register:
+    post:
+      tags:
+        - Регистрация
+      summary: Создает нового пользователя
+      requestBody:
+        description: Создает нового пользователя, но не активированного. Для активации следует использовать метод /confirm-register
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Register"
+      responses:
+        '201':
+          description: Возвращает id созданного пользователя
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+  /confirm-register:
+    post:
+      tags:
+        - Регистрация
+      summary: Подтверждение регистрации
+      requestBody:
+        description: Подтверждает регистрацию
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConfirmRegister"
+      responses:
+        '204':
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+  /confirm-code:
+    post:
+      tags:
+        - Регистрация
+      summary: Повторная отправка письма с кодом подтверждения
+      requestBody:
+        description: Отправляет письмо с кодом на почту
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+              required: 
+                - id
+      responses:
+        '204':
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
   /ads:
     get:
       tags: 
@@ -114,6 +222,49 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BadRequest"
+    post:
+      tags:
+        - Объявления
+      summary: Создание нового объявления
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdCreate"
+      responses:
+        '201':
+          description: Возвращает id созданного объявления (пока что объявление создается сразу активное, то есть доступно в get выдаче, впоследствии будет изменено, что объявление будет активным только после прохождения модерации)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+        '401':
+          description: "Метод недоступен неавторизованным пользователям"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorizationError"
+  /ads-create-values:
+    get:
+      tags:
+        - Объявления
+      summary: Возвращает список свойств с их вариантами значений для формы создания объявления
+      responses:
+        '200':
+          description: Возвращает список свойств с их вариантами значений для формы создания объявления
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdsCreateValues"
   /filter:
     get:
       tags:
@@ -299,6 +450,15 @@ components:
         code:
           type: string
           description: "Содержит символьный код ошибки"
+    AuthorizationError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: "Содержит текст ошибки"
+        code:
+          type: string
+          description: "Содержит символьный код ошибки"
     Login:
       type: object
       properties:
@@ -309,6 +469,40 @@ components:
         password:
           type: string
       required: [password]
+    Register:
+      type: object
+      properties:
+        email:
+          type: string
+        name:
+          type: string
+        lastName:
+          type: string
+        city:
+          type: string
+        phone:
+          type: integer
+        password:
+          type: string
+        confirmPassword:
+          type: string
+      required:
+        - email
+        - name
+        - lastName
+        - city
+        - password
+        - confirmPassword
+    ConfirmRegister:
+      type: object
+      properties:
+        id:
+          type: integer
+        code:
+          type: string
+      required:
+        - id
+        - code
     Ad:
       type: object
       properties:
@@ -397,6 +591,236 @@ components:
         userId:
           type: integer
           description: ID пользователя, разместившего объявление
+    AdCreate:
+      type: object
+      required:
+        - brand
+        - model
+        - condition
+        - gender
+        - material
+        - watchband
+        - sellerType
+        - year
+        - mechanism
+        - frameColor
+        - country
+        - form
+        - size
+        - clasp
+        - dial
+        - dialColor
+        - waterProtection
+        - description
+        - photo
+        - price
+        - promotion
+      properties:
+        brand:
+          type: integer
+        model:
+          type: string
+          maxLength: 255
+        condition:
+          type: integer
+        gender:
+          type: integer
+        material:
+          type: integer
+        watchband:
+          type: integer
+        sellerType:
+          type: integer
+        year:
+          type: integer
+        mechanism:
+          type: integer
+        frameColor:
+          type: integer
+        country:
+          type: integer
+        form:
+          type: integer
+        size:
+          type: integer
+        clasp:
+          type: integer
+        dial:
+          type: integer
+        dialColor:
+          type: integer
+        waterProtection:
+          type: integer
+        description:
+          type: string
+          maxLength: 200
+        photo:
+          type: array
+          items:
+            type: string
+            format: binary
+        price:
+          type: number
+        promotion:
+          type: string
+          enum:
+            - "1"
+            - "0"
+        promotionType:
+          type: integer
+    AdsCreateValues:
+      type: object
+      properties:
+        brand:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              code:
+                type: string
+        condition:
+          type: array
+          items:
+            type: object
+            properties:
+              id: 
+                type: string
+              value:
+                type: string
+        gender:
+          type: array
+          items:
+            type: object
+            properties:
+              id: 
+                type: string
+              value:
+                type: string
+        mechanism:
+          type: array
+          items:
+            type: object
+            properties:
+              id: 
+                type: string
+              value:
+                type: string
+        frameColor:
+          type: array
+          items:
+            type: object
+            properties:
+              id: 
+                type: string
+              name:
+                type: string
+              color:
+                type: string
+        dialColor:
+          type: array
+          items:
+            type: object
+            properties:
+              id: 
+                type: string
+              name:
+                type: string
+              color:
+                type: string
+        country:
+          type: array
+          items:
+            type: object
+            properties:
+              id: 
+                type: string
+              name:
+                type: string
+        sellerType:
+          type: array
+          items:
+            type: object
+            properties:
+              id: 
+                type: string
+              value:
+                type: string
+        material:
+          type: array
+          items:
+            type: object
+            properties:
+              id: 
+                type: string
+              value:
+                type: string
+        form:
+          type: array
+          items:
+            type: object
+            properties:
+              id: 
+                type: string
+              value:
+                type: string
+        size:
+          type: array
+          items:
+            type: object
+            properties:
+              id: 
+                type: string
+              value:
+                type: string
+        watchband:
+          type: array
+          items:
+            type: object
+            properties:
+              id: 
+                type: string
+              value:
+                type: string
+        clasp:
+          type: array
+          items:
+            type: object
+            properties:
+              id: 
+                type: string
+              value:
+                type: string
+        dial:
+          type: array
+          items:
+            type: object
+            properties:
+              id: 
+                type: string
+              value:
+                type: string
+        waterProtection:
+          type: array
+          items:
+            type: object
+            properties:
+              id: 
+                type: string
+              value:
+                type: string
+        promotionType:
+          type: array
+          items:
+            type: object
+            properties:
+              id: 
+                type: string
+              name:
+                type: string
     AdsFilter:
       type: object
       properties:
@@ -454,6 +878,8 @@ components:
                 type: string
               name:
                 type: string
+              color:
+                type: string
         dialColor:
           type: array
           items:
@@ -462,6 +888,8 @@ components:
               id:
                 type: string
               name:
+                type: string
+              color:
                 type: string
         country:
           type: array
@@ -498,6 +926,15 @@ components:
               id:
                 type: string
               name:
+                type: string
+        size:
+          type: array
+          items:
+            type: object
+            properties:
+              id: 
+                type: string
+              value:
                 type: string
         watchband:
           type: array
