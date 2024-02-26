@@ -27,6 +27,7 @@ servers:
 tags:
   - name: CSRF-токен
   - name: Аутентификация
+  - name: Пользователь
   - name: Объявления
   - name: Рекламы
   - name: Бренды
@@ -187,6 +188,134 @@ paths:
                 type: object
                 properties: {}
         '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+  /forgot:
+    post:
+      tags:
+        - Аутентификация
+      summary: Создает запрос на создание кода подтверждения и отправки кода на почту
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+              required:
+                - email
+      responses:
+        '200':
+          description: Возвращает id пользователя
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+        '404':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+  /confirm-forgot-code:
+    post:
+      tags:
+        - Аутентификация
+      summary: Проверяет код подтверждения
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                code:
+                  type: string
+              required:
+                - id
+                - code
+      responses:
+        '204':
+          description: Проверяет код подтверждения
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+  /change-password:
+    post:
+      tags:
+        - Аутентификация
+      summary: Меняет пароль пользователю
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                password:
+                  type: string
+                confirmPassword:
+                  type: string
+              required:
+                - id
+                - password
+                - confirmPassword
+      responses:
+        '204':
+          description: Меняет пароль пользователя
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+  /users/{id}:
+    get:
+      tags:
+        - Пользователь
+      summary: Возвращает поля пользователя
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: Возвращает данные пользователя
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
           description: "Ошибка запроса"
           content:
             application/json:
@@ -476,12 +605,8 @@ components:
           type: string
         name:
           type: string
-        lastName:
-          type: string
         city:
           type: string
-        phone:
-          type: integer
         password:
           type: string
         confirmPassword:
@@ -489,7 +614,6 @@ components:
       required:
         - email
         - name
-        - lastName
         - city
         - password
         - confirmPassword
@@ -503,6 +627,26 @@ components:
       required:
         - id
         - code
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        active:
+          type: integer
+          enum:
+            - 1
+            - 0
+        name:
+          type: string
+        lastName:
+          type: string
+        phone:
+          type: string
+        city:
+          type: string
     Ad:
       type: object
       properties:
