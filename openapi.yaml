@@ -67,7 +67,7 @@ paths:
             schema:
               $ref: "#/components/schemas/Login"
       responses:
-        '204':
+        '200':
           description: ""
           content:
             application/json:
@@ -92,7 +92,7 @@ paths:
         - Аутентификация
       summary: Производит выход из аккаунта
       responses:
-        '204':
+        '200':
           description: ""
           content:
             application/json:
@@ -150,7 +150,7 @@ paths:
             schema:
               $ref: "#/components/schemas/ConfirmRegister"
       responses:
-        '204':
+        '200':
           description: ""
           content:
             application/json:
@@ -180,7 +180,7 @@ paths:
               required: 
                 - id
       responses:
-        '204':
+        '200':
           description: ""
           content:
             application/json:
@@ -249,7 +249,7 @@ paths:
                 - id
                 - code
       responses:
-        '204':
+        '200':
           description: Проверяет код подтверждения
           content:
             application/json:
@@ -284,7 +284,7 @@ paths:
                 - password
                 - confirmPassword
       responses:
-        '204':
+        '200':
           description: Меняет пароль пользователя
           content:
             application/json: 
@@ -407,6 +407,31 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AdsFilter"
+  /ads/{id}:
+    get:
+      tags:
+        - Объявления
+      summary: Информация об одном объявлении
+      description: Возвращает информацию об одном объявлении
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: Возвращает данные одного объявления
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdsOne"
+        '404':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
   /advs:
     get:
       tags:
@@ -1129,6 +1154,94 @@ components:
           type: array
           items:
             type: string
+    AdsOne:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Id
+        photo:
+          type: array
+          items:
+            type: string
+          description: Фото
+        brand:
+          type: string
+          description: Бренд
+        model:
+          type: string
+          description: Модель
+        year:
+          type: string
+          description: Год выпуска
+        price:
+          type: string
+          description: Цена в рублях
+        condition:
+          type: string
+          description: Состояние часов
+        gender:
+          type: string
+          description: Пол
+        mechanism:
+          type: string
+          description: Механизм
+        frameColor:
+          type: string
+          description: Цвет часов
+        country:
+          type: string
+          description: Страна производства
+        material:
+          type: string
+          description: Материал часов
+        form:
+          type: string
+          description: Форма часов
+        size:
+          type: string
+          description: Размер часов
+        watchband:
+          type: string
+          description: Материал ремешка
+        clasp:
+          type: string
+          description: Тип застежки
+        dial:
+          type: string
+          description: Тип циферблата
+        dialColor:
+          type: string
+          description: Цвет циферблата
+        waterProtection:
+          type: string
+          description: Водозащита
+        description:
+          type: string
+          description: Описание
+        dateCreated:
+          type: string
+          description: Дата создания объявления
+        sellerType:
+          type: string
+          description: Тип продавца
+        more:
+          type: array
+          items:
+            type: string
+          description: Id похожих объявлений
+        user:
+          type: object
+          properties:
+            id: 
+              type: string
+            name:
+              type: string
+            city:
+              type: string
+            advCount:
+              type: string
+              description: Количество объявлений у продавца
     Adv:
       type: object
       properties:
