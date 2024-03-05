@@ -73,7 +73,9 @@ paths:
             application/json:
               schema:
                 type: object
-                properties: {}
+                properties:
+                  id:
+                    type: string
         '400':
           description: "Ошибка запроса"
           content:
