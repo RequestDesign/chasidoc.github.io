@@ -73,8 +73,8 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  id:
+                properties: 
+                  id: 
                     type: string
         '400':
           description: "Ошибка запроса"
@@ -299,6 +299,31 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BadRequest"
+  /users:
+    delete:
+      tags:
+        - Пользователь
+      summary: Удаляет пользователя
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: Удаляет пользователя
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
   /users/{id}:
     get:
       tags:
@@ -323,6 +348,69 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BadRequest"
+    patch:
+      tags:
+        - Пользователь
+      summary: Изменяет данные пользователя. Для смены пароля обязательно должно присутствовать все 3 поля `oldPassword`, `newPassword` и `confirmPassword`. Для смены аватара нужно передать строку в формате base64.
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+        - name: photo
+          in: query
+          schema:
+            type: string
+            format: base64
+          required: false
+        - name: name
+          in: query
+          schema:
+            type: string
+          required: false
+        - name: city
+          in: query
+          schema:
+            type: string
+          required: false
+        - name: birthday
+          in: query
+          schema:
+            type: string
+            format: date-time
+          required: false
+        - name: gender
+          in: query
+          schema:
+            type: string
+            enum:
+              - "M"
+              - "F"
+          required: false
+        - name: oldPassword
+          in: query
+          schema:
+            type: string
+          required: false
+        - name: newPassword
+          in: query
+          schema:
+            type: string
+          required: false
+        - name: confirmPassword
+          in: query
+          schema:
+            type: string
+          required: false
+      responses:
+        '200':
+          description: Изменяет данные пользователя
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
   /ads:
     get:
       tags: 
@@ -335,6 +423,7 @@ paths:
         - $ref: "#/components/parameters/limitQueryParam"
         - $ref: "#/components/parameters/pageQueryParam"
         - $ref: "#/components/parameters/adsFilterQueryParam"
+        - $ref: "#/components/parameters/searchQueryParam"
       responses:
         '200':
           description: Возвращает список объявлений
@@ -596,6 +685,12 @@ components:
             type: array
             items:
               type: string
+    searchQueryParam:
+      description: Используется для поиска данных. Формат поиска - название модели+бренд или наоборот
+      name: q
+      in: query
+      schema:
+        type: string
   schemas:
     BadRequest:
       type: object
@@ -674,6 +769,16 @@ components:
           type: string
         city:
           type: string
+        photo:
+          type: string
+        birthday:
+          type: string
+          format: date-time
+        gender:
+          type: string
+          enum:
+            - "M"
+            - "F"
     Ad:
       type: object
       properties:
