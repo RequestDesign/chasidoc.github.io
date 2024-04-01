@@ -299,6 +299,24 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BadRequest"
+  /user:
+    get:
+      tags:
+        - Пользователь
+      summary: Возвращает авторизованного пользователя
+      responses:
+        '200':
+          description: Возвращает данные пользователя
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
   /users:
     delete:
       tags:
@@ -473,6 +491,38 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthorizationError"
+  /ads/draft:
+    post:
+      tags:
+        - Объявления
+      summary: Создание черновика объявления
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdCreateDraft"
+      responses:
+        '201':
+          description: Возвращает id созданного объявления
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+        '401':
+          description: "Метод недоступен неавторизованным пользователям"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorizationError"
   /ads-create-values:
     get:
       tags:
@@ -523,6 +573,45 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BadRequest"
+    put:
+      tags:
+        - Объявления
+      summary: Редактирование объявления
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/AdCreate"
+                - $ref: "#/components/schemas/AdCreateDraft"
+      responses:
+        '201':
+          description: Возвращает id измененного объявления
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+        '401':
+          description: "Метод недоступен неавторизованным пользователям"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorizationError"
   /advs:
     get:
       tags:
@@ -867,6 +956,9 @@ components:
         userId:
           type: integer
           description: ID пользователя, разместившего объявление
+        video:
+          type: string
+          description: Ссылка на видео
     AdCreate:
       type: object
       required:
@@ -877,6 +969,7 @@ components:
         - material
         - watchband
         - sellerType
+        - documentsList
         - year
         - mechanism
         - frameColor
@@ -944,6 +1037,77 @@ components:
             - "0"
         promotionType:
           type: integer
+        documentsList:
+          type: integer
+        documentsDescription:
+          type: string
+        video:
+          type: string
+    AdCreateDraft:
+      type: object
+      required:
+        - brand
+        - model
+        - promotion
+      properties:
+        brand:
+          type: integer
+        model:
+          type: string
+          maxLength: 255
+        condition:
+          type: integer
+        gender:
+          type: integer
+        material:
+          type: integer
+        watchband:
+          type: integer
+        sellerType:
+          type: integer
+        year:
+          type: integer
+        mechanism:
+          type: integer
+        frameColor:
+          type: integer
+        country:
+          type: integer
+        form:
+          type: integer
+        size:
+          type: integer
+        clasp:
+          type: integer
+        dial:
+          type: integer
+        dialColor:
+          type: integer
+        waterProtection:
+          type: integer
+        description:
+          type: string
+          maxLength: 200
+        photo:
+          type: array
+          items:
+            type: string
+            format: binary
+        price:
+          type: number
+        promotion:
+          type: string
+          enum:
+            - "1"
+            - "0"
+        promotionType:
+          type: integer
+        documentsList:
+          type: integer
+        documentsDescription:
+          type: string
+        video:
+          type: string
     AdsCreateValues:
       type: object
       properties:
@@ -1094,6 +1258,15 @@ components:
             type: object
             properties:
               id: 
+                type: string
+              name:
+                type: string
+        documentsList:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
                 type: string
               name:
                 type: string
