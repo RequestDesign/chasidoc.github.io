@@ -612,6 +612,204 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthorizationError"
+  /user/ads/waiting:
+    get:
+      tags: 
+        - Объявления
+      summary: Список объявлений
+      description: Возвращает список объявлений пользователя со статусами "Отклонено", "Ожидает оплаты" и "Истек срок размещения"
+      responses:
+        '200':
+          description: Возвращает список объявлений
+          content: 
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Ad"
+              examples:
+                value:
+                  $ref: "#/components/examples/Ad"
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+        '401':
+          description: "Метод недоступен неавторизованным пользователям"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorizationError"
+  /user/ads/drafts:
+    get:
+      tags: 
+        - Объявления
+      summary: Список объявлений
+      description: Возвращает список объявлений пользователя со статусом "Черновик"
+      responses:
+        '200':
+          description: Возвращает список объявлений
+          content: 
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Ad"
+              examples:
+                value:
+                  $ref: "#/components/examples/Ad"
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+        '401':
+          description: "Метод недоступен неавторизованным пользователям"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorizationError"
+  /user/ads/active:
+    get:
+      tags: 
+        - Объявления
+      summary: Список объявлений
+      description: Возвращает список объявлений пользователя со статусами "Продвигается", "Размещено" и "На модерации"
+      responses:
+        '200':
+          description: Возвращает список объявлений
+          content: 
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Ad"
+              examples:
+                value:
+                  $ref: "#/components/examples/Ad"
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+        '401':
+          description: "Метод недоступен неавторизованным пользователям"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorizationError"
+  /user/ads/archieve:
+    get:
+      tags: 
+        - Объявления
+      summary: Список объявлений
+      description: Возвращает список объявлений пользователя со статусом "Закрыто"
+      responses:
+        '200':
+          description: Возвращает список объявлений
+          content: 
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Ad"
+              examples:
+                value:
+                  $ref: "#/components/examples/Ad"
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+        '401':
+          description: "Метод недоступен неавторизованным пользователям"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorizationError"
+  /user/ads/{id}/publish:
+    patch:
+      tags:
+        - Объявления
+      summary: Публикация объявления со статусами "Ожидает оплаты", "Истек срок размещения" и "Черновик"
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+      responses:
+        '201':
+          description: Возвращает id измененного объявления
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+        '401':
+          description: "Метод недоступен неавторизованным пользователям"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorizationError"
+  /user/ads/{id}/archieve:
+    patch:
+      tags:
+        - Объявления
+      summary: Добавление в архив объявлений со статусами "Ожидает оплаты", "Черновик", "Отклонено", "Размещено", "Продвигается" и "На модерации"
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+      responses:
+        '201':
+          description: Возвращает id измененного объявления
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+        '401':
+          description: "Метод недоступен неавторизованным пользователям"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorizationError"
   /advs:
     get:
       tags:
