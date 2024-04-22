@@ -32,6 +32,9 @@ tags:
   - name: Рекламы
   - name: Бренды
   - name: Регистрация
+  - name: Отзывы
+  - name: FAQ
+  - name: О приложении
 paths:
   /csrf:
     get:
@@ -317,6 +320,41 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BadRequest"
+        '401':
+          description: "Метод недоступен неавторизованным пользователям"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorizationError"
+  /user/reviews:
+    get:
+      tags:
+        - Отзывы
+      summary: Возвращает список отзывов, написанных авторизованным пользователем
+      parameters:
+        - $ref: "#/components/parameters/limitQueryParam"
+        - $ref: "#/components/parameters/pageQueryParam"
+      responses:
+        '200':
+          description: Возвращает список отзывов, написанных авторизованным пользователем
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Review"
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+        '401':
+          description: "Метод недоступен неавторизованным пользователям"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorizationError"
   /users:
     delete:
       tags:
@@ -429,6 +467,34 @@ paths:
               schema:
                 type: object
                 properties: {}
+  /users/{id}/reviews:
+    get:
+      tags:
+        - Отзывы
+      summary: Возвращает список отзывов, адресованных пользователю с указанным id
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+        - $ref: "#/components/parameters/limitQueryParam"
+        - $ref: "#/components/parameters/pageQueryParam"
+      responses:
+        '200':
+          description: Возвращает список отзывов, адресованных пользователю с указанным id
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Review"
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
   /ads:
     get:
       tags: 
@@ -852,6 +918,44 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BadRequest"
+  /faq:
+    get:
+      tags:
+        - FAQ
+      summary: Возвращает список вопросов и ответов
+      responses:
+        '200':
+          description: Возвращает информацию о приложении
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+                    description:
+                      type: string
+  /about:
+    get:
+      tags:
+        - О приложении
+      summary: Возвращает информацию о приложении
+      responses:
+        '200':
+          description: Возвращает информацию о приложении
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  description:
+                    type: string
 components:
   parameters:
     sortQueryParam:
@@ -1151,9 +1255,10 @@ components:
             name:
               type: string
           description: Страна производства
-        userId:
-          type: integer
+        user:
           description: ID пользователя, разместившего объявление
+          allOf:
+            - $ref: "#/components/schemas/ShortUser"
         video:
           type: string
           description: Ссылка на видео
@@ -1741,6 +1846,75 @@ components:
         code:
           type: string
       description: Бренд часов
+    Review:
+      type: object
+      properties:
+        id:
+          type: string
+        user:
+          description: Кем написан отзыв
+          allOf:
+            - $ref: "#/components/schemas/ShortUser"
+        dateCreated:
+          type: string
+          format: datetime
+        rating:
+          type: string
+        polite:
+          description: Вежливый
+          type: string
+          enum:
+            - "Y"
+            - "null"
+          nullable: true
+        conscientious:
+          description: Добросовестный
+          type: string
+          enum:
+            - "Y"
+            - "null"
+          nullable: true
+        quick_reply:
+          description: Быстро отвечает
+          type: string
+          enum:
+            - "Y"
+            - "null"
+          nullable: true
+        rude:
+          description: Хамит
+          type: string
+          enum:
+            - "Y"
+            - "null"
+          nullable: true
+        unfair:
+          description: Нечестный
+          type: string
+          enum:
+            - "Y"
+            - "null"
+          nullable: true
+        long_reply:
+          description: Долго отвечает
+          type: string
+          enum:
+            - "Y"
+            - "null"
+          nullable: true
+    ShortUser:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        lastName:
+          type: string
+        city:
+          type: string
+        photo:
+          type: string
   examples:
     Ad:
       value:
