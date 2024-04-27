@@ -211,8 +211,8 @@ paths:
               properties:
                 email:
                   type: string
-              required:
-                - email
+                phone:
+                  type: number
       responses:
         '200':
           description: Возвращает id пользователя
@@ -404,7 +404,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BadRequest"
-    patch:
+    post:
       tags:
         - Пользователь
       summary: Изменяет данные пользователя. Для смены пароля обязательно должно присутствовать все 3 поля `oldPassword`, `newPassword` и `confirmPassword`. Для смены аватара нужно передать строку в формате base64.
@@ -414,59 +414,19 @@ paths:
           schema:
             type: integer
           required: true
-        - name: photo
-          in: query
-          schema:
-            type: string
-            format: base64
-          required: false
-        - name: name
-          in: query
-          schema:
-            type: string
-          required: false
-        - name: city
-          in: query
-          schema:
-            type: string
-          required: false
-        - name: birthday
-          in: query
-          schema:
-            type: string
-            format: date-time
-          required: false
-        - name: gender
-          in: query
-          schema:
-            type: string
-            enum:
-              - "M"
-              - "F"
-          required: false
-        - name: oldPassword
-          in: query
-          schema:
-            type: string
-          required: false
-        - name: newPassword
-          in: query
-          schema:
-            type: string
-          required: false
-        - name: confirmPassword
-          in: query
-          schema:
-            type: string
-          required: false
       responses:
         '200':
           description: Изменяет данные пользователя
           content:
             application/json:
               schema:
-                type: object
-                properties: {}
+                $ref: "#/components/schemas/UserEdit"
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
   /users/{id}/reviews:
     get:
       tags:
@@ -659,6 +619,38 @@ paths:
       responses:
         '201':
           description: Возвращает id измененного объявления
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+        '401':
+          description: "Метод недоступен неавторизованным пользователям"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorizationError"
+    delete:
+      tags:
+        - Объявления
+      summary: Удаление объявления
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: Возвращает id удаленного объявления
           content:
             application/json:
               schema:
@@ -1116,6 +1108,8 @@ components:
       properties:
         email:
           type: string
+        phone:
+          type: number
         name:
           type: string
         city:
@@ -1125,7 +1119,6 @@ components:
         confirmPassword:
           type: string
       required:
-        - email
         - name
         - city
         - password
@@ -1170,6 +1163,30 @@ components:
           enum:
             - "M"
             - "F"
+    UserEdit:
+      type: object
+      properties:
+        photo:
+          type: string
+          format: base64
+        name:
+          type: string
+        city:
+          type: string
+        birthday:
+          type: string
+          format: date-time
+        gender:
+          type: string
+          enum: 
+            - M
+            - F
+        oldPassword:
+          type: string
+        newPassword:
+          type: string
+        confirmPassword:
+          type: string
     Ad:
       type: object
       properties:
@@ -1749,7 +1766,12 @@ components:
             type: string
           description: Фото
         brand:
-          type: string
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
           description: Бренд
         model:
           type: string
@@ -1761,43 +1783,108 @@ components:
           type: string
           description: Цена в рублях
         condition:
-          type: string
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
           description: Состояние часов
         gender:
-          type: string
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
           description: Пол
         mechanism:
-          type: string
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
           description: Механизм
         frameColor:
-          type: string
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
           description: Цвет часов
         country:
-          type: string
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
           description: Страна производства
         material:
-          type: string
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
           description: Материал часов
         form:
-          type: string
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
           description: Форма часов
         size:
-          type: string
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
           description: Размер часов
         watchband:
-          type: string
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
           description: Материал ремешка
         clasp:
-          type: string
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
           description: Тип застежки
         dial:
-          type: string
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
           description: Тип циферблата
         dialColor:
-          type: string
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
           description: Цвет циферблата
         waterProtection:
-          type: string
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
           description: Водозащита
         description:
           type: string
@@ -1806,7 +1893,12 @@ components:
           type: string
           description: Дата создания объявления
         sellerType:
-          type: string
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
           description: Тип продавца
         more:
           type: array
