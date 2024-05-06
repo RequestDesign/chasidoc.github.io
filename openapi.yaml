@@ -355,6 +355,57 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthorizationError"
+    post:
+      tags:
+        - Отзывы
+      summary: Создает новый отзыв
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReviewCreate"
+      responses:
+        '201':
+          description: Возвращает id созданного отзыва
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+        '401':
+          description: "Метод недоступен неавторизованным пользователям"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorizationError"
+  /review-ratings:
+    get:
+      tags:
+        - Отзывы
+      summary: Возвращает список оценок и соответствующих им качеств
+      responses:
+        '200':
+          description: Возвращает список оценок и соответствующих им качеств
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ReviewRatings"
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
   /users:
     delete:
       tags:
@@ -414,13 +465,19 @@ paths:
           schema:
             type: integer
           required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserEdit" 
       responses:
         '200':
           description: Изменяет данные пользователя
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserEdit"
+                type: object
+                properties: {}
         '400':
           description: "Ошибка запроса"
           content:
@@ -1163,6 +1220,11 @@ components:
           enum:
             - "M"
             - "F"
+        dateCreated:
+          type: string
+          format: datetime
+        adsCount:
+          type: string
     UserEdit:
       type: object
       properties:
@@ -1914,9 +1976,38 @@ components:
               type: string
             city:
               type: string
+            photo:
+              type: string
             advCount:
               type: string
               description: Количество объявлений у продавца
+        documentsList:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+        documentsDescription:
+          type: string
+        video:
+          type: string
+        promotion:
+          type: string
+        promotionType:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+        status:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
     Adv:
       type: object
       properties:
@@ -1994,6 +2085,63 @@ components:
             - "Y"
             - "null"
           nullable: true
+    ReviewCreate:
+      type: object
+      properties:
+        to:
+          type: number
+          description: Кому написан отзыв
+        rating:
+          type: number
+        polite:
+          type: number
+          enum:
+            - 1
+            - 0
+        conscientious:
+          type: number
+          enum:
+            - 1
+            - 0
+        quick_reply:
+          type: number
+          enum:
+            - 1
+            - 0
+        rude:
+          type: number
+          enum:
+            - 1
+            - 0
+        unfair:
+          type: number
+          enum:
+            - 1
+            - 0
+        long_reply:
+          type: number
+          enum:
+            - 1
+            - 0
+      required:
+        - to
+        - rating
+    ReviewRatings:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        qualities:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+              name:
+                type: string
     ShortUser:
       type: object
       properties:
