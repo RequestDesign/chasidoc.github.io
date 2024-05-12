@@ -326,6 +326,41 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthorizationError"
+  /user/confirm-email:
+    post:
+      tags:
+        - Пользователь
+      summary: Подтверждение почты при смене
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: number
+              required:
+                - code
+      responses:
+        '200':
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {}
+        '404':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+        '401':
+          description: "Метод недоступен неавторизованным пользователям"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorizationError"
   /user/reviews:
     get:
       tags:
@@ -656,7 +691,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BadRequest"
-    put:
+    post:
       tags:
         - Объявления
       summary: Редактирование объявления
@@ -1249,6 +1284,9 @@ components:
           type: string
         confirmPassword:
           type: string
+        email:
+          type: string
+          format: email
     Ad:
       type: object
       properties:
