@@ -35,6 +35,7 @@ tags:
   - name: Отзывы
   - name: FAQ
   - name: О приложении
+  - name: Избранное
 paths:
   /csrf:
     get:
@@ -174,16 +175,18 @@ paths:
         - Регистрация
       summary: Повторная отправка письма с кодом подтверждения
       requestBody:
-        description: Отправляет письмо с кодом на почту
+        description: Отправляет письмо с кодом на почту(телефон)
         content:
           application/json:
             schema:
               type: object
               properties:
-                id:
-                  type: integer
-              required: 
-                - id
+                email:
+                  type: string
+                  format: email
+                phone:
+                  type: number
+                  format: phone
       responses:
         '200':
           description: ""
@@ -441,6 +444,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BadRequest"
+  /reviews/{id}:
+    delete:
+      tags:
+        - Отзывы
+      summary: Удаление отзыва
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: Возвращает id удаленного отзыва
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
   /users:
     delete:
       tags:
@@ -960,6 +984,90 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthorizationError"
+  /user/ads/{id}/promote:
+    post:
+      tags:
+        - Объявления
+      summary: Добавление в архив объявлений со статусом "Размещено"
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+      responses:
+        '201':
+          description: Возвращает id измененного объявления
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+        '401':
+          description: "Метод недоступен неавторизованным пользователям"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorizationError"
+  /favorites:
+    get:
+      tags:
+        - Избранное
+      summary: Возвращает список объявлений пользователя, добавленных в избранное
+      responses:
+        '200':
+          description: Возвращает список объявлений пользователя, добавленных в избранное
+          content: 
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Ad"
+  /favorites/{id}:
+    post:
+      tags:
+        - Избранное
+      summary: Добавляет(удаляет) объявление в избранное(из избранного)
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+      responses:
+        '201':
+          description: Добавляет(удаляет) объявление в избранное(из избранного)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
   /advs:
     get:
       tags:
