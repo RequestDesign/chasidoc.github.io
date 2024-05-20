@@ -424,6 +424,31 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthorizationError"
+  /user/photo:
+    delete:
+      tags:
+        - Пользователь
+      summary: Удаление фото пользователя
+      responses:
+        '200':
+          description: ""
+          content: 
+            application/json:
+              schema:
+                type: array
+                items: {}
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+        '401':
+          description: "Метод недоступен неавторизованным пользователям"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorizationError"
   /review-ratings:
     get:
       tags:
@@ -613,14 +638,11 @@ paths:
               $ref: "#/components/schemas/AdCreate"
       responses:
         '201':
-          description: Возвращает id созданного объявления (пока что объявление создается сразу активное, то есть доступно в get выдаче, впоследствии будет изменено, что объявление будет активным только после прохождения модерации)
+          description: Возвращает id созданного объявления и ссылку для оплаты
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  id:
-                    type: string
+                $ref: "#/components/schemas/AdsPay"
         '400':
           description: "Ошибка запроса"
           content:
@@ -988,7 +1010,43 @@ paths:
     post:
       tags:
         - Объявления
-      summary: Добавление в архив объявлений со статусом "Размещено"
+      summary: Продвижение объявлений со статусом "Размещено"
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+      responses:
+        '201':
+          description: Возвращает id измененного объявления и ссылку для оплаты
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdsPay"
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+        '401':
+          description: "Метод недоступен неавторизованным пользователям"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorizationError"
+  /user/ads/{id}/pay:
+    post:
+      tags:
+        - Объявления
+      summary: Оплата объявлений со статусом "Ожидает оплаты"
       parameters:
         - name: id
           in: path
@@ -1007,10 +1065,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  id:
-                    type: string
+                $ref: "#/components/schemas/AdsPay"
         '400':
           description: "Ошибка запроса"
           content:
@@ -2154,6 +2209,22 @@ components:
               type: string
             name:
               type: string
+        currencies:
+          type: object
+          properties:
+            usd:
+              type: number
+            eur:
+              type: number
+    AdsPay:
+      type: object
+      properties:
+        id:
+          type: string
+        url:
+          description: Ссылка для оплаты тарифа
+          type: string
+          nullable: true
     Adv:
       type: object
       properties:
