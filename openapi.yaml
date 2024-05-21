@@ -36,6 +36,7 @@ tags:
   - name: FAQ
   - name: О приложении
   - name: Избранное
+  - name: Города
 paths:
   /csrf:
     get:
@@ -334,6 +335,41 @@ paths:
       tags:
         - Пользователь
       summary: Подтверждение почты при смене
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: number
+              required:
+                - code
+      responses:
+        '200':
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {}
+        '404':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+        '401':
+          description: "Метод недоступен неавторизованным пользователям"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorizationError"
+  /user/confirm-phone:
+    post:
+      tags:
+        - Пользователь
+      summary: Подтверждение телефона при смене
       requestBody:
         content:
           application/json:
@@ -1123,6 +1159,47 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BadRequest"
+  /search-requests:
+    get:
+      tags:
+        - Объявления
+      summary: Возвращает историю поисковых запросов
+      responses:
+        '200':
+          description: Возвращает историю поисковых запросов
+          content: 
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    post:
+      tags:
+        - Объявления
+      summary: Добавляет строку поискового запроса в историю
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                q:
+                  type: string
+                  description: Строка поискового запроса
+      responses:
+        '200':
+          description: Добавляет строку поискового запроса в историю
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {}
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
   /advs:
     get:
       tags:
@@ -1203,6 +1280,25 @@ paths:
                     type: string
                   description:
                     type: string
+  /cities:
+    get:
+      tags:
+        - Города
+      summary: Возвращает список городов
+      responses:
+        '200':
+          description: Возвращает список городов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    region: 
+                      type: string
+                    city: 
+                      type: string
 components:
   parameters:
     sortQueryParam:
@@ -1450,6 +1546,9 @@ components:
         email:
           type: string
           format: email
+        phone:
+          type: string
+          format: phone
     Ad:
       type: object
       properties:
@@ -1542,31 +1641,10 @@ components:
         video:
           type: string
           description: Ссылка на видео
+        favorite:
+          type: boolean
     AdCreate:
       type: object
-      required:
-        - brand
-        - model
-        - condition
-        - gender
-        - material
-        - watchband
-        - sellerType
-        - documentsList
-        - year
-        - mechanism
-        - frameColor
-        - country
-        - form
-        - size
-        - clasp
-        - dial
-        - dialColor
-        - waterProtection
-        - description
-        - photo
-        - price
-        - promotion
       properties:
         brand:
           type: integer
@@ -1628,10 +1706,6 @@ components:
           type: string
     AdCreateDraft:
       type: object
-      required:
-        - brand
-        - model
-        - promotion
       properties:
         brand:
           type: integer
@@ -2216,6 +2290,8 @@ components:
               type: number
             eur:
               type: number
+        favorite:
+          type: boolean
     AdsPay:
       type: object
       properties:
@@ -2253,6 +2329,10 @@ components:
           type: string
         user:
           description: Кем написан отзыв
+          allOf:
+            - $ref: "#/components/schemas/ShortUser"
+        to:
+          description: Кому написан
           allOf:
             - $ref: "#/components/schemas/ShortUser"
         dateCreated:
@@ -2371,6 +2451,8 @@ components:
         city:
           type: string
         photo:
+          type: string
+        phone:
           type: string
   examples:
     Ad:
