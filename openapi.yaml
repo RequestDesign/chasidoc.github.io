@@ -239,6 +239,35 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BadRequest"
+  /forgot/confirm-code:
+    post:
+      tags:
+        - Аутентификация
+      summary: Отправляет заново код для сценария "Забыли пароль"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                phone:
+                  type: number
+      responses:
+        '200':
+          description: Отправляет повторно код
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {}
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
   /confirm-forgot-code:
     post:
       tags:
@@ -389,6 +418,41 @@ paths:
                 type: array
                 items: {}
         '404':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+        '401':
+          description: "Метод недоступен неавторизованным пользователям"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorizationError"
+  /user/confirm-code:
+    post:
+      tags:
+        - Пользователь
+      summary: Отправляет заново код для сценария "Смена почты или номера телефона"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                phone:
+                  type: number
+      responses:
+        '200':
+          description: Отправляет повторно код
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {}
+        '400':
           description: "Ошибка запроса"
           content:
             application/json:
@@ -2292,6 +2356,16 @@ components:
               type: number
         favorite:
           type: boolean
+        views:
+          type: string
+        likes:
+          type: string
+        calls:
+          type: string
+        activeTo:
+          type: string
+          format: datetime
+          nullable: true
     AdsPay:
       type: object
       properties:
@@ -2312,6 +2386,9 @@ components:
           type: string
         description:
           type: string
+        advLink:
+          type: string
+          nullable: true
     Brand:
       type: object
       properties:
