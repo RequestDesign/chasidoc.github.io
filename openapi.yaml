@@ -590,6 +590,39 @@ paths:
                 properties:
                   id:
                     type: string
+  /reviews/{id}/complain:
+    post:
+      tags:
+        - Отзывы
+      summary: Обжалование отзыва
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: Возвращает id созданного диалога
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+        '401':
+          description: "Метод недоступен неавторизованным пользователям"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorizationError"
   /users:
     delete:
       tags:
@@ -896,6 +929,37 @@ paths:
                 properties:
                   id:
                     type: string
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+        '401':
+          description: "Метод недоступен неавторизованным пользователям"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorizationError"
+  /ads/{id}/call:
+    post:
+      tags:
+        - Объявления
+      summary: Увеличивает количество звонков
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {}
         '400':
           description: "Ошибка запроса"
           content:
@@ -2363,6 +2427,10 @@ components:
         calls:
           type: string
         activeTo:
+          type: string
+          format: datetime
+          nullable: true
+        datePromotion:
           type: string
           format: datetime
           nullable: true
