@@ -36,7 +36,9 @@ tags:
   - name: FAQ
   - name: О приложении
   - name: Избранное
+  - name: Просмотренное
   - name: Города
+  - name: Тарифы
 paths:
   /csrf:
     get:
@@ -1287,6 +1289,51 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BadRequest"
+  /viewed:
+    get:
+      tags:
+        - Просмотренное
+      summary: Возвращает список просмотренных объявлений пользователя
+      responses:
+        '200':
+          description: Возвращает список просмотренных объявлений пользователя
+          content: 
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Ad"
+  /viewed/{id}:
+    post:
+      tags:
+        - Просмотренное
+      summary: Добавляет объявление в просмотренное
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+      responses:
+        '201':
+          description: Добавляет объявление в просмотренное
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          description: "Ошибка запроса"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
   /search-requests:
     get:
       tags:
@@ -1427,6 +1474,20 @@ paths:
                       type: string
                     city: 
                       type: string
+  /tariffs:
+    get:
+      tags:
+        - Тарифы
+      summary: Возвращает список тарифов
+      responses:
+        '200':
+          description: Возвращает список тарифов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Tariff"
 components:
   parameters:
     sortQueryParam:
@@ -1588,7 +1649,7 @@ components:
         email:
           type: string
         phone:
-          type: number
+          type: string
         name:
           type: string
         city:
@@ -1771,6 +1832,12 @@ components:
           description: Ссылка на видео
         favorite:
           type: boolean
+        views:
+          type: string
+        calls:
+          type: string
+        likes:
+          type: string
     AdCreate:
       type: object
       properties:
@@ -2598,6 +2665,21 @@ components:
         photo:
           type: string
         phone:
+          type: string
+    Tariff:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        additionalText:
+          type: array
+          items:
+            type: string
+        description:
+          type: string
+        price:
           type: string
   examples:
     Ad:
