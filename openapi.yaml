@@ -82,7 +82,7 @@ paths:
                 type: object
                 properties: 
                   id: 
-                    type: string
+                    type: number
         '400':
           description: "Ошибка запроса"
           content:
@@ -1797,6 +1797,29 @@ components:
         city: 
           type: string
           description: Город продажи
+        promotion:
+          type: string
+          enum:
+            - "1"
+            - "0"
+        status:
+          type: string
+        dateCreated:
+          type: string
+          format: datetime
+        documentsDescription:
+          type: string
+        video:
+          type: string
+          description: Ссылка на видео
+        views:
+          type: string
+        calls:
+          type: string
+        likes:
+          type: string
+        favorite:
+          type: boolean
         brand:
           $ref: "#/components/schemas/Brand"
         frameColor:
@@ -1806,6 +1829,8 @@ components:
               type: string
             name:
               type: string
+            color:
+              type: string
           description: Цвет корпуса
         dialColor:
           type: object
@@ -1813,6 +1838,8 @@ components:
             id:
               type: string
             name:
+              type: string
+            color:
               type: string
           description: Цвет циферблата
         country:
@@ -1827,17 +1854,20 @@ components:
           description: ID пользователя, разместившего объявление
           allOf:
             - $ref: "#/components/schemas/ShortUser"
-        video:
-          type: string
-          description: Ссылка на видео
-        favorite:
-          type: boolean
-        views:
-          type: string
-        calls:
-          type: string
-        likes:
-          type: string
+        promotionType:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+        documentsList:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
     AdCreate:
       type: object
       properties:
@@ -2110,16 +2140,24 @@ components:
             type: object
             properties:
               id: 
-                type: string
+                type: number
               name:
                 type: string
+              description:
+                type: string
+              price:
+                type: string
+              list:
+                type: array
+                items:
+                  type: string
         documentsList:
           type: array
           items:
             type: object
             properties:
               id:
-                type: string
+                type: number
               name:
                 type: string
     AdsFilter:
@@ -2286,6 +2324,15 @@ components:
           type: array
           items:
             type: string
+        documentsList:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
     AdsOne:
       type: object
       properties:
@@ -2701,9 +2748,18 @@ components:
           description: "Описание"
           price: "5000"
           photo: 
-            - "/upload/uf/6b4/0rxlrge47ssthmbgf599wuonte49n7we.jpg"
-            - "/upload/uf/6b4/0rxlrge47ssthmbgf599wuonte49n7we.jpg"
-          city: ""
+            - "http://chasi/upload/uf/6b4/0rxlrge47ssthmbgf599wuonte49n7we.jpg"
+            - "http://chasi/upload/uf/6b4/0rxlrge47ssthmbgf599wuonte49n7we.jpg"
+          city: "Москва"
+          promotion: "1"
+          status: "Продвигается"
+          dateCreated: "2024-05-03T08:52:40+03:00"
+          documentsDescription: "Какой-то дполнительный набор документов"
+          video: "https://youtube.com"
+          views: "23"
+          calls: "17"
+          likes: "3"
+          favorite: true
           brand:
             id: "3"
             name: "Fossil"
@@ -2711,13 +2767,27 @@ components:
           frameColor: 
             id: "1"
             name: "Синий"
+            color: "#0000FF"
           dialColor: 
             id: "1"
             name: "Синий"
+            color: "#0000FF"
           country:
             id: "6"
             name: "Австрия"
-          userId: 1
+          user: 
+            id: "1"
+            name: "test"
+            lastName: "test"
+            city: "Москва"
+            photo: "http://chasi/upload/main/5e1/3ij3sh9fg2rvfdufdg9rh4xm0bog5wve.png"
+            phone: "88888888888"
+          promotionType:
+            id: 18
+            name: "Golden"
+          documentsList:
+            id: 694
+            name: "В наличии"
     Brand:
       value:
         - id: "1"
