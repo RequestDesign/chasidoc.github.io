@@ -1132,7 +1132,10 @@ paths:
           application/json:
             schema:
               type: object
-              properties: {}
+              properties: 
+                promotionType:
+                    type: string
+                    description: Является обязательным для статуса "Истек срок размещения"
       responses:
         '201':
           description: Возвращает id измененного объявления и ссылка на оплаты при наличии
@@ -1204,7 +1207,7 @@ paths:
     post:
       tags:
         - Объявления
-      summary: Продвижение объявлений со статусом "Размещено"
+      summary: Продвижение объявлений со статусом "Размещено" и "Ожидает оплаты"
       parameters:
         - name: id
           in: path
@@ -1219,7 +1222,6 @@ paths:
               properties: 
                 promotionType:
                   type: string
-                  description: Является обязательным для статуса "Истек срок размещения"
       responses:
         '201':
           description: Возвращает id измененного объявления и ссылку для оплаты
@@ -1547,7 +1549,7 @@ components:
   parameters:
     sortQueryParam:
       description: |
-        Используйте поле `sort` для сортировки запрашиваемых ресурсов. Поле `sort` представляет собой строку, состоящую из полей, по которым будет происходить сортировка, разделенные запятой. Если по определенному полю нужно изменить направление сортировки в обратную сторону, то перед названием поля нужно поставить знак `-`. Например: `?sort=id,-model`, `?sort=-id`
+        Используйте поле `sort` для сортировки запрашиваемых ресурсов. Поле `sort` представляет собой строку, состоящую из полей, по которым будет происходить сортировка, разделенные запятой. Если по определенному полю нужно изменить направление сортировки в обратную сторону, то перед названием поля нужно поставить знак `-`. Например: `?sort=id,-model`, `?sort=-id. Для случайной сортировки использовать sort=rand`
       name: sort
       in: query
       schema:
@@ -1971,11 +1973,6 @@ components:
             format: binary
         price:
           type: number
-        promotion:
-          type: string
-          enum:
-            - "1"
-            - "0"
         promotionType:
           type: integer
         documentsList:
@@ -2032,11 +2029,6 @@ components:
             format: binary
         price:
           type: number
-        promotion:
-          type: string
-          enum:
-            - "1"
-            - "0"
         promotionType:
           type: integer
         documentsList:
